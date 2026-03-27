@@ -1,0 +1,58 @@
+{
+  "patients": [
+    {
+      "id": "PID-001",
+      "name": "Pratik",
+      "age": "26",
+      "gender": "Male",
+      "lastVisitDate": "2026-03-27",
+      "visits": [
+        {
+          "id": "9ds8ya6",
+          "date": "2026-03-27",
+          "complaints": "eyes pain",
+          "diagnosis": "sleep",
+          "treatment": "sleep",
+          "medicines": [],
+          "nextFollowUpDate": ""
+        },
+        {
+          "id": "cmmtkez",
+          "date": "2026-03-27",
+          "complaints": "stomach pain",
+          "diagnosis": "gastro",
+          "treatment": "diet",
+          "medicines": [
+            {
+              "medicine": "Ibuprofen 400mg",
+              "instructions": "1-1-1"
+            }
+          ],
+          "nextFollowUpDate": "2026-04-03"
+        },
+        {
+          "id": "3i44pog",
+          "date": "2026-03-27",
+          "complaints": "head ache",
+          "diagnosis": "head ache",
+          "treatment": "sleep and water",
+          "medicines": [
+            {
+              "medicine": "Amoxicillin 250mg",
+              "instructions": "1-1-1"
+            }
+          ],
+          "nextFollowUpDate": "2026-04-10"
+        }
+      ]
+    },
+    {
+      "id": "PID-002",
+      "name": "Preet",
+      "age": "20",
+      "gender": "Male",
+      "lastVisitDate": "2026-03-27",
+      "visits": []
+    }
+  ]
+}
