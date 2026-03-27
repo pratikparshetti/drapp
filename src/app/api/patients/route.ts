@@ -8,36 +8,27 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const data = await request.json();
+  console.log('[POST /api/patients] Raw request data:', JSON.stringify(data, null, 2));
+
   const patients = await readPatients();
+  console.log('[POST /api/patients] Current patient count:', patients.length);
 
   const id = await getNextPatientId();
   const today = new Date().toISOString().split('T')[0];
-
-  // Create initial visit from onboarding form data
-  const visits = [];
-  if (data.complaints || data.diagnosis || data.treatment) {
-    visits.push({
-      id: Math.random().toString(36).substring(2, 9),
-      date: today,
-      complaints: data.complaints || '',
-      diagnosis: data.diagnosis || '',
-      treatment: data.treatment || '',
-      medicines: data.medicines || [],
-      nextFollowUpDate: data.nextFollowUpDate || '',
-    });
-  }
 
   const newPatient: Patient = {
     id,
     name: data.name,
     age: data.age,
     gender: data.gender,
-    lastVisitDate: today,
-    visits,
+    lastVisitDate: '', // No visit yet
+    visits: [],        // Start with empty history
   };
+  console.log('[POST /api/patients] New patient object:', JSON.stringify(newPatient, null, 2));
 
   patients.push(newPatient);
   await writePatients(patients);
+  console.log('[POST /api/patients] Patient saved successfully. Total patients:', patients.length);
 
   return NextResponse.json(newPatient);
 }

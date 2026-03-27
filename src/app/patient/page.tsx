@@ -33,10 +33,13 @@ function PatientDashboard() {
   const patientId = searchParams.get('id');
   const isNew = !patientId;
 
+  console.log('[DEBUG] PatientPage - patientId:', patientId, 'isNew:', isNew);
+
+
   const [loading, setLoading] = useState(false);
   const [patient, setPatient] = useState<Patient | null>(null);
   const [medicinesList, setMedicinesList] = useState<string[]>([]);
-  
+
   // Form State
   const [patientName, setPatientName] = useState('');
   const [patientAge, setPatientAge] = useState('');
@@ -95,16 +98,22 @@ function PatientDashboard() {
     setLoading(true);
 
     try {
-      const payload = {
-        name: patientName,
-        age: patientAge,
-        gender: patientGender,
-        complaints,
-        diagnosis,
-        treatment,
-        medicines: prescriptions.filter(p => p.medicine.trim() !== ''),
-        nextFollowUpDate,
-      };
+      let payload;
+      if (isNew) {
+        payload = {
+          name: patientName,
+          age: patientAge,
+          gender: patientGender,
+        };
+      } else {
+        payload = {
+          complaints,
+          diagnosis,
+          treatment,
+          medicines: prescriptions.filter(p => p.medicine.trim() !== ''),
+          nextFollowUpDate,
+        };
+      }
 
       let res;
       if (isNew) {
@@ -150,22 +159,22 @@ function PatientDashboard() {
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
             <div>
               <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Full Name</label>
-              <input 
-                type="text" className="input" value={patientName} onChange={e => setPatientName(e.target.value)} 
+              <input
+                type="text" className="input" value={patientName} onChange={e => setPatientName(e.target.value)}
                 disabled={!isNew} required placeholder="Enter full name"
               />
             </div>
             <div>
               <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Age</label>
-              <input 
-                type="number" className="input" value={patientAge} onChange={e => setPatientAge(e.target.value)} 
+              <input
+                type="number" className="input" value={patientAge} onChange={e => setPatientAge(e.target.value)}
                 disabled={!isNew} required placeholder="Years"
               />
             </div>
             <div>
               <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Gender</label>
-              <select 
-                className="input" value={patientGender} onChange={e => setPatientGender(e.target.value)} 
+              <select
+                className="input" value={patientGender} onChange={e => setPatientGender(e.target.value)}
                 disabled={!isNew}
               >
                 <option value="Male">Male</option>
@@ -175,88 +184,100 @@ function PatientDashboard() {
             </div>
           </div>
 
-          <hr style={{ margin: '1.5rem 0', border: 'none', borderTop: '1px solid var(--border-color)' }} />
+          {!isNew && (
+            <>
+              <hr style={{ margin: '1.5rem 0', border: 'none', borderTop: '1px solid var(--border-color)' }} />
 
-          <h3>Visit Information</h3>
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.25rem' }}>Complaints</label>
-            <textarea 
-              className="input" rows={2} value={complaints} onChange={e => setComplaints(e.target.value)} 
-              placeholder="What is the patient experiencing?" required
-            />
-          </div>
-
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.25rem' }}>Diagnosis</label>
-            <textarea 
-              className="input" rows={2} value={diagnosis} onChange={e => setDiagnosis(e.target.value)} 
-              placeholder="What is the diagnosis?" required
-            />
-          </div>
-
-          <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.25rem' }}>Suggested Treatment</label>
-            <textarea 
-              className="input" rows={2} value={treatment} onChange={e => setTreatment(e.target.value)} 
-              placeholder="Plan of action?" required
-            />
-          </div>
-
-          <hr style={{ margin: '1.5rem 0', border: 'none', borderTop: '1px solid var(--border-color)' }} />
-
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-            <h3>Medicines / Prescription</h3>
-            <button type="button" onClick={addPrescription} className="btn btn-outline" style={{ padding: '0.25rem 0.5rem' }}>+ Add Row</button>
-          </div>
-
-          {prescriptions.map((pres, idx) => (
-            <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1.5fr 2fr auto', gap: '0.75rem', marginBottom: '0.75rem', alignItems: 'flex-end' }}>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Medicine Name</label>
-                <div style={{ position: 'relative' }}>
-                  <input 
-                    list="medicine-list"
-                    className="input" 
-                    value={pres.medicine} 
-                    onChange={e => updatePrescription(idx, 'medicine', e.target.value)}
-                    placeholder="Search or type name"
-                  />
-                  <datalist id="medicine-list">
-                    {medicinesList.map(med => <option key={med} value={med} />)}
-                  </datalist>
-                </div>
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Instructions (e.g. 1-0-1 After Food)</label>
-                <input 
-                  type="text" className="input" value={pres.instructions} 
-                  onChange={e => updatePrescription(idx, 'instructions', e.target.value)}
-                  placeholder="When to take?"
+              <h3>Visit Information</h3>
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.25rem' }}>Complaints</label>
+                <textarea
+                  className="input" rows={2} value={complaints} onChange={e => setComplaints(e.target.value)}
+                  placeholder="What is the patient experiencing?" required
                 />
               </div>
-              {prescriptions.length > 1 && (
-                <button 
-                  type="button" onClick={() => removePrescription(idx)} 
-                  className="btn btn-outline" style={{ color: 'var(--error-color)', padding: '0.4rem' }}
-                >
-                  ✕
-                </button>
-              )}
-            </div>
-          ))}
 
-          <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-            <div style={{ width: '200px' }}>
-              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.25rem' }}>Next Follow-up Date</label>
-              <input 
-                type="date" className="input" value={nextFollowUpDate} 
-                onChange={e => setNextFollowUpDate(e.target.value)}
-              />
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.25rem' }}>Diagnosis</label>
+                <textarea
+                  className="input" rows={2} value={diagnosis} onChange={e => setDiagnosis(e.target.value)}
+                  placeholder="What is the diagnosis?" required
+                />
+              </div>
+
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.25rem' }}>Suggested Treatment</label>
+                <textarea
+                  className="input" rows={2} value={treatment} onChange={e => setTreatment(e.target.value)}
+                  placeholder="Plan of action?" required
+                />
+              </div>
+
+              <hr style={{ margin: '1.5rem 0', border: 'none', borderTop: '1px solid var(--border-color)' }} />
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <h3>Medicines / Prescription</h3>
+                <button type="button" onClick={addPrescription} className="btn btn-outline" style={{ padding: '0.25rem 0.5rem' }}>+ Add Row</button>
+              </div>
+
+              {prescriptions.map((pres, idx) => (
+                <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1.5fr 2fr auto', gap: '0.75rem', marginBottom: '0.75rem', alignItems: 'flex-end' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Medicine Name</label>
+                    <div style={{ position: 'relative' }}>
+                      <input
+                        list="medicine-list"
+                        className="input"
+                        value={pres.medicine}
+                        onChange={e => updatePrescription(idx, 'medicine', e.target.value)}
+                        placeholder="Search or type name"
+                      />
+                      <datalist id="medicine-list">
+                        {medicinesList.map(med => <option key={med} value={med} />)}
+                      </datalist>
+                    </div>
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Instructions (e.g. 1-0-1 After Food)</label>
+                    <input
+                      type="text" className="input" value={pres.instructions}
+                      onChange={e => updatePrescription(idx, 'instructions', e.target.value)}
+                      placeholder="When to take?"
+                    />
+                  </div>
+                  {prescriptions.length > 1 && (
+                    <button
+                      type="button" onClick={() => removePrescription(idx)}
+                      className="btn btn-outline" style={{ color: 'var(--error-color)', padding: '0.4rem' }}
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+              ))}
+
+              <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                <div style={{ width: '200px' }}>
+                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.25rem' }}>Next Follow-up Date</label>
+                  <input
+                    type="date" className="input" value={nextFollowUpDate}
+                    onChange={e => setNextFollowUpDate(e.target.value)}
+                  />
+                </div>
+                <button type="submit" className="btn btn-primary" disabled={loading} style={{ padding: '0.75rem 2rem' }}>
+                  {loading ? 'Saving...' : 'Save Visit Record'}
+                </button>
+              </div>
+            </>
+          )}
+
+          {isNew && (
+            <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
+              <button type="submit" className="btn btn-primary" disabled={loading} style={{ padding: '0.75rem 2rem' }}>
+                {loading ? 'Saving...' : 'Complete Onboarding'}
+              </button>
             </div>
-            <button type="submit" className="btn btn-primary" disabled={loading} style={{ padding: '0.75rem 2rem' }}>
-              {loading ? 'Saving...' : (isNew ? 'Complete Onboarding' : 'Save Visit Record')}
-            </button>
-          </div>
+          )}
         </form>
 
         {!isNew && patient && patient.visits.length > 0 && (
@@ -264,15 +285,15 @@ function PatientDashboard() {
             <h3>Medical History</h3>
             <div style={{ marginTop: '1.5rem', maxHeight: '600px', overflowY: 'auto' }}>
               {patient.visits.map((visit, idx) => (
-                <div key={visit.id} style={{ 
-                  borderLeft: '2px solid var(--accent-color)', 
-                  paddingLeft: '1.5rem', 
-                  paddingBottom: '2rem', 
-                  position: 'relative' 
+                <div key={visit.id} style={{
+                  borderLeft: '2px solid var(--accent-color)',
+                  paddingLeft: '1.5rem',
+                  paddingBottom: '2rem',
+                  position: 'relative'
                 }}>
-                  <div style={{ 
-                    width: '12px', height: '12px', background: 'var(--accent-color)', borderRadius: '50%', 
-                    position: 'absolute', left: '-7px', top: '5px' 
+                  <div style={{
+                    width: '12px', height: '12px', background: 'var(--accent-color)', borderRadius: '50%',
+                    position: 'absolute', left: '-7px', top: '5px'
                   }} />
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <span style={{ fontWeight: 600, fontSize: '1rem' }}>{new Date(visit.date).toLocaleDateString()}</span>
