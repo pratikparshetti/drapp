@@ -53,6 +53,10 @@ export async function readMedicines(): Promise<string[]> {
   }
 }
 
+export async function writeMedicines(medicines: string[]): Promise<void> {
+  await fs.writeFile(MEDICINES_FILE, JSON.stringify({ medicines }, null, 2), 'utf8');
+}
+
 export async function getNextPatientId(): Promise<string> {
   const patients = await readPatients();
   if (patients.length === 0) return 'PID-001';

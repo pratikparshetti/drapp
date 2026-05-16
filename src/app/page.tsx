@@ -41,9 +41,14 @@ export default function Home() {
           <h1>Patient Records</h1>
           <p style={{ color: 'var(--text-secondary)' }}>View and manage registered patients</p>
         </div>
-        <Link href="/patient" className="btn btn-primary" style={{ padding: '0.75rem 1.5rem', fontSize: '1rem' }}>
-          + New Patient
-        </Link>
+        <div style={{ display: 'flex', gap: '1rem' }}>
+          <Link href="/medicines" className="btn btn-outline" style={{ padding: '0.75rem 1.5rem', fontSize: '1rem' }}>
+            Manage Medicines
+          </Link>
+          <Link href="/patient" className="btn btn-primary" style={{ padding: '0.75rem 1.5rem', fontSize: '1rem' }}>
+            + New Patient
+          </Link>
+        </div>
       </div>
 
       <div className="card">
